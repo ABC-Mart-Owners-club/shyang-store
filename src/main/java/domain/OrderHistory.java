@@ -12,5 +12,4 @@ public class OrderHistory {
     private int quantity; // 주문 수량
     private int price; // 총 주문 가격
     private OrderType orderType; // 주문 타입
-    private User user;
 }

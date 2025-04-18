@@ -7,11 +7,11 @@ import java.util.Map;
 
 public class ProductRepository {
 
-    private Long sequence = 3L;
+    private Long sequence = 2L;
     static Map<Long, Product> productMap = new HashMap<>(Map.of(
-            1L, new Product(1L, "Nike Air Max", 100_000, 500),
-            2L, new Product(2L, "Adidas Ultraboost", 120_000, 200),
-            3L, new Product(3L, "Puma RS-X", 90_000, 60)
+            0L, new Product(0L, "Nike Air Max", 100_000, 500),
+            1L, new Product(1L, "Adidas Ultraboost", 120_000, 200),
+            2L, new Product(2L, "Puma RS-X", 90_000, 60)
     ));
 
     public Product findById(Long id) {

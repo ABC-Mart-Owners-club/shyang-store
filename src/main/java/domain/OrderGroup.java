@@ -10,5 +10,6 @@ public class OrderGroup {
 
     private Long id; // 주문 그룹 식별 값
     private OrderHistory orderHistory; // 상품 단건
+    private User user; // 장바구니 담은 유저
 
 }

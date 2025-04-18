@@ -9,4 +9,5 @@ import lombok.Getter;
 public class User {
     private Long id; // 유저 식별 값
     private String name; // 유저 이름
+    private int balance; // 유저 잔액
 }
