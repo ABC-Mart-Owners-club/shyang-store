@@ -1,7 +1,10 @@
 package repository;
 
-import domain.*;
+import domain.OrderGroup;
+import domain.OrderHistory;
+import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,30 +14,21 @@ public class OrderGroupRepository {
     private Long sequence = 0L;
     static Map<Long, OrderGroup> orderGroupMap = new HashMap<>();
 
+
+    public OrderGroup save(OrderGroup orderGroup) {
+        orderGroupMap.put(orderGroup.getId(), orderGroup);
+        sequence = sequence + 1L;
+        return orderGroup;
+    }
+
     public OrderGroup findById(Long id) {
         return orderGroupMap.get(id);
     }
 
-    public List<OrderGroup> findByOrderHistory(OrderHistory orderHistory) {
-        return orderGroupMap.values().stream()
-                .filter(orderGroup -> orderGroup.getOrderHistory().getId().equals(orderHistory.getId()))
-                .toList();
+    public List<OrderGroup> findAll() {
+        return new ArrayList<>(orderGroupMap.values());
     }
 
-    public List<OrderGroup> findByOUser(User user) {
-        return orderGroupMap.values().stream()
-                .filter(orderGroup -> orderGroup.getUser().getId().equals(user.getId()))
-                .toList();
-    }
+    public Long getSequence() {return sequence;}
 
-    public Long save(OrderHistory orderHistory, User user) {
-        sequence ++;
-        OrderGroup orderGroup = new OrderGroup(sequence, orderHistory, user);
-        orderGroupMap.put(sequence, orderGroup);
-        return sequence;
-    }
-
-    public Long getSequence() {
-        return sequence;
-    }
 }

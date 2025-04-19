@@ -1,38 +1,41 @@
 package repository;
 
-import domain.OrderHistory;
-import domain.OrderType;
-import domain.Product;
-import domain.User;
+import domain.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OrderHistoryRepository {
 
     private Long sequence = 0L;
-    static Map<Long, OrderHistory> historyMap = new HashMap<>();
+    static Map<Long, OrderHistory> orderHistoryMap = new HashMap<>();
 
-    public OrderHistory findById(Long id) {
-        return historyMap.get(id);
+
+    public OrderHistory save(OrderHistory orderHistory) {
+        orderHistoryMap.put(orderHistory.getId(), orderHistory);
+        sequence = sequence + 1L;
+        return orderHistory;
     }
 
-    public List<OrderHistory> findByProduct(Product product) {
-        return historyMap.values().stream()
-                .filter(orderHistory -> orderHistory.getProduct().getId().equals(product.getId()))
+    public OrderHistory findById(Long id) {
+        return orderHistoryMap.get(id);
+    }
+
+    public List<OrderHistory> findByOrderGroupId(Long orderId) {
+        return orderHistoryMap.values().stream()
+                .filter(orderHistory -> orderHistory.getOrderGroupId().equals(orderId))
                 .toList();
     }
 
-    public Long save(Product product, int quantity, int price, OrderType orderType) {
-        sequence ++;
-        OrderHistory orderHistory = new OrderHistory(sequence, product, quantity, price, orderType);
-        historyMap.put(sequence, orderHistory);
-        return sequence;
+    public List<OrderHistory> findByProductAndStatus(String productCode, Status status) {
+        return orderHistoryMap.values().stream().filter(orderHistory ->
+                orderHistory.getProductCode().equals(productCode) && orderHistory.getStatus().equals(status)).toList();
+
     }
 
-    public Long getSequence() {
-        return sequence;
+    public List<OrderHistory> findAll() {
+        return new ArrayList<>(orderHistoryMap.values());
     }
+
+    public Long getSequence() {return sequence;}
 
 }
