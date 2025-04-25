@@ -2,9 +2,9 @@ import domain.OrderHistory;
 import domain.Product;
 import domain.User;
 import dto.request.OrderProductRequestDto;
-import repository.OrderHistoryRepository;
-import repository.ProductRepository;
-import repository.UserRepository;
+import repository.impl.memory.OrderHistoryMemRepository;
+import repository.impl.memory.ProductMemRepository;
+import repository.impl.memory.UserMemRepository;
 import service.OrderService;
 
 import java.util.List;
@@ -25,8 +25,8 @@ public class ShoeMain {
 
         orderService.orderProducts(orderInfos, "Simon");
 
-        UserRepository userRepository = new UserRepository();
-        ProductRepository productRepository = new ProductRepository();
+        UserMemRepository userRepository = new UserMemRepository();
+        ProductMemRepository productRepository = new ProductMemRepository();
 
         User byName = userRepository.findByName("Simon");
         Product product1 = productRepository.findByCode("CODE-1");
@@ -49,7 +49,7 @@ public class ShoeMain {
         System.out.println(result5);
 
 
-        OrderHistoryRepository orderHistoryRepository = new OrderHistoryRepository();
+        OrderHistoryMemRepository orderHistoryRepository = new OrderHistoryMemRepository();
         List<OrderHistory> orders = orderHistoryRepository.findAll();
         List<OrderHistory> cancelOrders = orders.stream().filter(order -> order.getUserName().equals("Simon")).toList();
 

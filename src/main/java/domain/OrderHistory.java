@@ -11,14 +11,14 @@ import lombok.ToString;
 public class OrderHistory {
 
     private Long id; // 식별값
-    private Long orderGroupId;
-    private String productCode;
 
     private int quantity; // 구매 수량
     private int price; // 구매 가격
-
     private Status status;
-    private String userName;
+
+    private User user;
+    private OrderGroup orderGroup;
+    private Product product;
 
     public void cancelStatus(){
         this.status = Status.CANCELLED;

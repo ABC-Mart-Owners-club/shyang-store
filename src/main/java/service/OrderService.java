@@ -6,39 +6,45 @@ import repository.OrderGroupRepository;
 import repository.OrderHistoryRepository;
 import repository.ProductRepository;
 import repository.UserRepository;
+import repository.impl.memory.OrderGroupMemRepository;
+import repository.impl.memory.OrderHistoryMemRepository;
+import repository.impl.memory.ProductMemRepository;
+import repository.impl.memory.UserMemRepository;
 
 import java.util.List;
 
 public class OrderService {
 
-    private final OrderHistoryRepository orderHistoryRepository = new OrderHistoryRepository();
-    private final OrderGroupRepository orderGroupRepository = new OrderGroupRepository();
-    private final ProductRepository productRepository =  new ProductRepository();
-    private final UserRepository userRepository = new UserRepository();
+    private final OrderGroupRepository orderGroupRepository = new OrderGroupMemRepository();
+    private final OrderHistoryRepository orderHistoryRepository = new OrderHistoryMemRepository();
+    private final ProductRepository productRepository =  new ProductMemRepository();
+    private final UserRepository userRepository = new UserMemRepository();
 
 
     // 주문 기능
     // 트랜잭션 처리 됐다고 가정 ~~
     public void orderProducts(List<OrderProductRequestDto> orderInfos, String userName) {
 
-        OrderGroup orderGroup = orderGroupRepository.save(new OrderGroup(orderGroupRepository.getSequence()));
-        User currentUser = userRepository.findByName(userName);
+        orderGroupRepository.getSequence();
 
-        for (OrderProductRequestDto orderInfo : orderInfos) {
-
-            String productCode = orderInfo.getProductCode();
-            Product product = productRepository.findByCode(productCode);
-
-            int quantity = orderInfo.getQuantity();
-            int price = product.getPrice();
-            int amount = quantity * price;
-
-            OrderHistory orderHistory = new OrderHistory(orderHistoryRepository.getSequence(), orderGroup.getId(), product.getCode(), quantity, price ,Status.PAID, currentUser.getName());
-            orderHistoryRepository.save(orderHistory);
-
-            product.deductStock(quantity);
-            currentUser.chargeBalance(amount);
-        }
+//        OrderGroup orderGroup = orderGroupRepository.save(new OrderGroup(orderGroupRepository.));
+//        User currentUser = userRepository.findByName(userName);
+//
+//        for (OrderProductRequestDto orderInfo : orderInfos) {
+//
+//            String productCode = orderInfo.getProductCode();
+//            Product product = productRepository.findByCode(productCode);
+//
+//            int quantity = orderInfo.getQuantity();
+//            int price = product.getPrice();
+//            int amount = quantity * price;
+//
+//            OrderHistory orderHistory = new OrderHistory(orderHistoryRepository, orderGroup.getId(), product.getCode(), quantity, price ,Status.PAID, currentUser.getName());
+//            orderHistoryRepository.save(orderHistory);
+//
+//            product.deductStock(quantity);
+//            currentUser.chargeBalance(amount);
+//        }
     }
 
     // 전체 취소
