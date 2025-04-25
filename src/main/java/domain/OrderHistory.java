@@ -2,7 +2,6 @@ package domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -23,5 +22,13 @@ public class OrderHistory {
 
     public void cancelStatus(){
         this.status = Status.CANCELLED;
+    }
+
+    public boolean isCancelled() {
+        return this.status == Status.CANCELLED;
+    }
+
+    public int getTotalPrice(){
+        return this.price * this.quantity;
     }
 }

@@ -1,8 +1,6 @@
 package repository;
 
 import domain.OrderGroup;
-import domain.OrderHistory;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,10 +17,6 @@ public class OrderGroupRepository {
         orderGroupMap.put(orderGroup.getId(), orderGroup);
         sequence = sequence + 1L;
         return orderGroup;
-    }
-
-    public OrderGroup findById(Long id) {
-        return orderGroupMap.get(id);
     }
 
     public List<OrderGroup> findAll() {

@@ -17,7 +17,11 @@ public class OrderHistoryRepository {
     }
 
     public OrderHistory findById(Long id) {
-        return orderHistoryMap.get(id);
+        OrderHistory orderHistory = orderHistoryMap.get(id);
+        if (orderHistory == null) {
+            throw new IllegalArgumentException("주문 내역이 존재하지 않습니다.");
+        }
+        return orderHistory;
     }
 
     public List<OrderHistory> findByOrderGroupId(Long orderId) {

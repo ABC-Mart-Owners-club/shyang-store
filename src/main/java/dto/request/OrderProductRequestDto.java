@@ -1,6 +1,5 @@
 package dto.request;
 
-import domain.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
