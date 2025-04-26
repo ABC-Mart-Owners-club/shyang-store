@@ -16,9 +16,9 @@ public class OrderHistory {
     private int price; // 구매 가격
     private Status status;
 
-    private User user;
-    private OrderGroup orderGroup;
-    private Product product;
+    private String userName;
+    private Long groupId;
+    private String productCode;
 
     public void cancelStatus(){
         this.status = Status.CANCELLED;

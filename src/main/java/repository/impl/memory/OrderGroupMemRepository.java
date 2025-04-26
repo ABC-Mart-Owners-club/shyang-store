@@ -10,14 +10,13 @@ import java.util.Map;
 
 public class OrderGroupMemRepository implements OrderGroupRepository {
 
-    private Long sequence = 0L;
     static Map<Long, OrderGroup> orderGroupMap = new HashMap<>();
 
 
     @Override
     public OrderGroup save(OrderGroup orderGroup) {
         orderGroupMap.put(orderGroup.getId(), orderGroup);
-        sequence = sequence + 1L;
+        MemPk.orderGroupPk += 1;
         return orderGroup;
     }
 
@@ -26,8 +25,5 @@ public class OrderGroupMemRepository implements OrderGroupRepository {
         return new ArrayList<>(orderGroupMap.values());
     }
 
-    public Long getSequence() {
-        return sequence;
-    }
 
 }

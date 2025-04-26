@@ -7,14 +7,14 @@ import java.util.*;
 
 public class OrderHistoryMemRepository implements OrderHistoryRepository {
 
-    private Long sequence = 0L;
     static Map<Long, OrderHistory> orderHistoryMap = new HashMap<>();
 
 
     @Override
     public OrderHistory save(OrderHistory orderHistory) {
+
         orderHistoryMap.put(orderHistory.getId(), orderHistory);
-        sequence = sequence + 1L;
+        MemPk.OrderHistoryPk += 1;
         return orderHistory;
     }
 
@@ -30,14 +30,14 @@ public class OrderHistoryMemRepository implements OrderHistoryRepository {
     @Override
     public List<OrderHistory> findByOrderGroupId(Long orderId) {
         return orderHistoryMap.values().stream()
-                .filter(orderHistory -> orderHistory.getOrderGroup().getId().equals(orderId))
+                .filter(orderHistory -> orderHistory.getGroupId().equals(orderId))
                 .toList();
     }
 
     @Override
     public List<OrderHistory> findByProductAndStatus(String productCode, Status status) {
         return orderHistoryMap.values().stream().filter(orderHistory ->
-                orderHistory.getProduct().getCode().equals(productCode) && orderHistory.getStatus().equals(status)).toList();
+                orderHistory.getProductCode().equals(productCode) && orderHistory.getStatus().equals(status)).toList();
 
     }
 
@@ -45,7 +45,5 @@ public class OrderHistoryMemRepository implements OrderHistoryRepository {
     public List<OrderHistory> findAll() {
         return new ArrayList<>(orderHistoryMap.values());
     }
-
-    public Long getSequence() {return sequence;}
 
 }

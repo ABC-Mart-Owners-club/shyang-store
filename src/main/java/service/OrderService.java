@@ -2,14 +2,12 @@ package service;
 
 import domain.*;
 import dto.request.OrderProductRequestDto;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import repository.OrderGroupRepository;
 import repository.OrderHistoryRepository;
 import repository.ProductRepository;
-import repository.UserRepository;
-import repository.impl.memory.OrderGroupMemRepository;
-import repository.impl.memory.OrderHistoryMemRepository;
-import repository.impl.memory.ProductMemRepository;
-import repository.impl.memory.UserMemRepository;
+import repository.impl.memory.*;
 
 import java.util.List;
 
@@ -18,33 +16,27 @@ public class OrderService {
     private final OrderGroupRepository orderGroupRepository = new OrderGroupMemRepository();
     private final OrderHistoryRepository orderHistoryRepository = new OrderHistoryMemRepository();
     private final ProductRepository productRepository =  new ProductMemRepository();
-    private final UserRepository userRepository = new UserMemRepository();
 
 
     // 주문 기능
     // 트랜잭션 처리 됐다고 가정 ~~
     public void orderProducts(List<OrderProductRequestDto> orderInfos, String userName) {
 
-        orderGroupRepository.getSequence();
+        OrderGroup orderGroup = orderGroupRepository.save(new OrderGroup(MemPk.orderGroupPk));
 
-//        OrderGroup orderGroup = orderGroupRepository.save(new OrderGroup(orderGroupRepository.));
-//        User currentUser = userRepository.findByName(userName);
-//
-//        for (OrderProductRequestDto orderInfo : orderInfos) {
-//
-//            String productCode = orderInfo.getProductCode();
-//            Product product = productRepository.findByCode(productCode);
-//
-//            int quantity = orderInfo.getQuantity();
-//            int price = product.getPrice();
-//            int amount = quantity * price;
-//
-//            OrderHistory orderHistory = new OrderHistory(orderHistoryRepository, orderGroup.getId(), product.getCode(), quantity, price ,Status.PAID, currentUser.getName());
-//            orderHistoryRepository.save(orderHistory);
-//
-//            product.deductStock(quantity);
-//            currentUser.chargeBalance(amount);
-//        }
+        for (OrderProductRequestDto orderInfo : orderInfos) {
+
+            String productCode = orderInfo.getProductCode();
+            Product product = productRepository.findByCode(productCode);
+
+            int quantity = orderInfo.getQuantity();
+            int price = product.getPrice();
+
+            product.deductStock(quantity);
+
+            OrderHistory orderHistory = new OrderHistory(MemPk.OrderHistoryPk, quantity, price ,Status.PAID, userName, orderGroup.getId(), productCode);
+            orderHistoryRepository.save(orderHistory);
+        }
     }
 
     // 전체 취소
