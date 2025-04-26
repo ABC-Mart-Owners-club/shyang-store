@@ -88,14 +88,10 @@ public class OrderService {
         if (order.isCancelled()) {throw new IllegalStateException("이미 취소된 주문입니다.");}
 
         Product product = productRepository.findByCode(order.getProductCode());
-        User user = userRepository.findByName(order.getUserName());
 
         int orderQuantity = order.getQuantity();
-        int amount = order.getTotalPrice();
-
 
         order.cancelStatus();
-        user.refundBalance(amount);
         product.refundStock(orderQuantity);
     }
 }
