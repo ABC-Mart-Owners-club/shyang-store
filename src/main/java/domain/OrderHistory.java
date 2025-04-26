@@ -8,6 +8,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 // 주문 내역
+// 부분 결제 아니면 cashAmount, cardAmount Null
+// 풀 현금이면 carName Null
 public class OrderHistory {
 
     private Long id; // 식별값
@@ -20,6 +22,10 @@ public class OrderHistory {
     private Long groupId;
     private String productCode;
 
+    private Integer cashAmount;
+    private Integer cardAmount;
+    private String cardName;
+
     public void cancelStatus(){
         this.status = Status.CANCELLED;
     }
@@ -28,7 +34,7 @@ public class OrderHistory {
         return this.status == Status.CANCELLED;
     }
 
-    public int getTotalPrice(){
-        return this.price * this.quantity;
+    public boolean isPartial() {
+        return Status.PARTIAL_PAID.equals(this.status);
     }
 }

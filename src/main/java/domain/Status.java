@@ -2,6 +2,6 @@ package domain;
 
 public enum Status {
 
-    PAID, CANCELLED
+    CACHE_PAID, CANCELLED, CARD_PAID, PARTIAL_PAID
 
 }
