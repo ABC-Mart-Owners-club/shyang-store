@@ -9,6 +9,8 @@ import repository.ProductRepository;
 import repository.impl.memory.*;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class OrderService {
 
@@ -115,6 +117,26 @@ public class OrderService {
         return result;
     }
 
+    public int getSalesByCard(String cardName) {
+        // 풀 카드 결제 금액 합
+        int cardTotal = orderHistoryRepository.findByCardNameAndStatus(cardName, Status.CARD_PAID).stream()
+                .mapToInt(order -> order.getPrice() * order.getQuantity())
+                .sum();
+
+        // 부분 결제건 중 groupId 별로 하나씩만 골라서 cardAmount 합산
+        int partialTotal = orderHistoryRepository.findByCardNameAndStatus(cardName, Status.PARTIAL_PAID).stream()
+                .collect(Collectors.toMap(
+                        OrderHistory::getGroupId,
+                        Function.identity(),
+                        (existing, duplicate) -> existing  // groupId 겹치면 기존 것 유지
+                ))
+                .values().stream()
+                .mapToInt(OrderHistory::getCardAmount)
+                .sum();
+
+        return cardTotal + partialTotal;
+    }
+
 
     private void cancelOrder(OrderHistory order) {
 
@@ -127,4 +149,5 @@ public class OrderService {
         order.cancelStatus();
         product.refundStock(orderQuantity);
     }
+
 }

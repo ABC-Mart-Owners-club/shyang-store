@@ -16,6 +16,10 @@ public interface OrderHistoryRepository {
 
     public List<OrderHistory> findByProductAndStatus(String productCode, Status status);
 
+    public List<OrderHistory> findByProductAndNotStatus(String productCode, Status status);
+
+    public List<OrderHistory> findByCardNameAndStatus(String cardName, Status status);
+
     public List<OrderHistory> findAll();
 
 }

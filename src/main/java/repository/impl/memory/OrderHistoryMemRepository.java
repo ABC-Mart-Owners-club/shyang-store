@@ -42,6 +42,20 @@ public class OrderHistoryMemRepository implements OrderHistoryRepository {
     }
 
     @Override
+    public List<OrderHistory> findByProductAndNotStatus(String productCode, Status status) {
+        return orderHistoryMap.values().stream().filter(orderHistory ->
+                orderHistory.getProductCode().equals(productCode) && !orderHistory.getStatus().equals(status)).toList();
+    }
+
+    @Override
+    public List<OrderHistory> findByCardNameAndStatus(String cardName, Status status) {
+        return orderHistoryMap.values().stream()
+                .filter(orderHistory -> cardName.equals(orderHistory.getCardName()) && orderHistory.getStatus().equals(status))
+                .toList();
+
+    }
+
+    @Override
     public List<OrderHistory> findAll() {
         return new ArrayList<>(orderHistoryMap.values());
     }
