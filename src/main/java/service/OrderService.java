@@ -2,8 +2,7 @@ package service;
 
 import domain.*;
 import dto.request.OrderProductRequestDto;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import dto.request.PayStatusRequestDto;
 import repository.OrderGroupRepository;
 import repository.OrderHistoryRepository;
 import repository.ProductRepository;
@@ -20,22 +19,61 @@ public class OrderService {
 
     // 주문 기능
     // 트랜잭션 처리 됐다고 가정 ~~
-    public void orderProducts(List<OrderProductRequestDto> orderInfos, String userName) {
+    public void orderProducts(List<OrderProductRequestDto> orderInfos, String userName, PayStatusRequestDto payStatusRequest) {
 
         OrderGroup orderGroup = orderGroupRepository.save(new OrderGroup(MemPk.orderGroupPk));
 
-        for (OrderProductRequestDto orderInfo : orderInfos) {
+        // 부분 결제
+        if (payStatusRequest.isPartial()) {
 
-            String productCode = orderInfo.getProductCode();
-            Product product = productRepository.findByCode(productCode);
+            int cardAmount = payStatusRequest.getCardAmount();
+            int cashAmount = payStatusRequest.getCashAmount();
+            String carName = payStatusRequest.getCardName();
 
-            int quantity = orderInfo.getQuantity();
-            int price = product.getPrice();
+            int totalAmount = 0;
+            for (OrderProductRequestDto orderInfo : orderInfos) {
 
-            product.deductStock(quantity);
+                String productCode = orderInfo.getProductCode();
+                Product product = productRepository.findByCode(productCode);
 
-            OrderHistory orderHistory = new OrderHistory(MemPk.OrderHistoryPk, quantity, price ,Status.PAID, userName, orderGroup.getId(), productCode);
-            orderHistoryRepository.save(orderHistory);
+                int quantity = orderInfo.getQuantity();
+                int price = product.getPrice();
+
+                totalAmount += quantity * price;
+
+                product.deductStock(quantity);
+
+                OrderHistory orderHistory = new OrderHistory(MemPk.OrderHistoryPk, quantity, price ,Status.PARTIAL_PAID, userName, orderGroup.getId(), productCode, cashAmount, cardAmount, carName);
+                orderHistoryRepository.save(orderHistory);
+            }
+
+            System.out.println(totalAmount);
+
+            if (totalAmount != (cardAmount + cashAmount)) {throw new IllegalStateException("총 결제 금액이 맞지 않아요");}
+
+        } else { // 부분 결제 X
+            for (OrderProductRequestDto orderInfo : orderInfos) {
+
+                Status status = null;
+                String cardName = null;
+                if(payStatusRequest.isFullCache()) {
+                    status = Status.CACHE_PAID;
+                } else {
+                    status = Status.CARD_PAID;
+                    cardName = payStatusRequest.getCardName();
+                }
+
+                String productCode = orderInfo.getProductCode();
+                Product product = productRepository.findByCode(productCode);
+
+                int quantity = orderInfo.getQuantity();
+                int price = product.getPrice();
+
+                product.deductStock(quantity);
+
+                OrderHistory orderHistory = new OrderHistory(MemPk.OrderHistoryPk, quantity, price ,status, userName, orderGroup.getId(), productCode, null, null, cardName);
+                orderHistoryRepository.save(orderHistory);
+            }
         }
     }
 
