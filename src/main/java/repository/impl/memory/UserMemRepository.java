@@ -8,17 +8,17 @@ import java.util.Map;
 
 public class UserMemRepository implements UserRepository {
     static Map<String, User> userMap = new HashMap<>(Map.of(
-            "Simon", new User("Simon", 5_000_000),
-            "Ian", new User("Ian", 2_000_000),
-            "Potter", new User("Potter", 3_000_000),
-            "Ashie", new User("Ashie", 1_000_000),
-            "Jack", new User("Jack", 200_000)
+            "Simon", new User("Simon"),
+            "Ian", new User("Ian"),
+            "Potter", new User("Potter"),
+            "Ashie", new User("Ashie"),
+            "Jack", new User("Jack")
     ));
 
 
     @Override
     public User save(String name, int balance) {
-        User user = new User(name, balance);
+        User user = new User(name);
         userMap.put(name, user);
         return user;
     }
