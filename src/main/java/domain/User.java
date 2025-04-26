@@ -2,12 +2,12 @@ package domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @Getter
+@ToString
 // 유저 정보
 public class User {
-    private Long id; // 유저 식별 값
-    private String name; // 유저 이름
-    private int balance; // 유저 잔액
+    private String name; // 유저 이름 (유니크라고 가정)
 }

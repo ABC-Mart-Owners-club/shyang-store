@@ -1,38 +1,21 @@
 package repository;
 
 import domain.OrderHistory;
-import domain.OrderType;
-import domain.Product;
-import domain.User;
+import domain.Status;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class OrderHistoryRepository {
+public interface OrderHistoryRepository {
 
-    private Long sequence = 0L;
-    static Map<Long, OrderHistory> historyMap = new HashMap<>();
+    public OrderHistory save(OrderHistory orderHistory);
 
-    public OrderHistory findById(Long id) {
-        return historyMap.get(id);
-    }
+    public OrderHistory findById(Long id);
 
-    public List<OrderHistory> findByProduct(Product product) {
-        return historyMap.values().stream()
-                .filter(orderHistory -> orderHistory.getProduct().getId().equals(product.getId()))
-                .toList();
-    }
+    public List<OrderHistory> findByOrderGroupId(Long orderId);
 
-    public Long save(Product product, int quantity, int price, OrderType orderType) {
-        sequence ++;
-        OrderHistory orderHistory = new OrderHistory(sequence, product, quantity, price, orderType);
-        historyMap.put(sequence, orderHistory);
-        return sequence;
-    }
+    public List<OrderHistory> findByProductAndStatus(String productCode, Status status);
 
-    public Long getSequence() {
-        return sequence;
-    }
+    public List<OrderHistory> findAll();
 
 }
