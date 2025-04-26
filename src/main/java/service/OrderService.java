@@ -93,6 +93,9 @@ public class OrderService {
     public void cancelOrder(Long orderHistoryId) {
 
         OrderHistory order = orderHistoryRepository.findById(orderHistoryId);
+        if(order.isPartial()){
+            throw new IllegalStateException("분할 결제건은 부분 취소가 불가능합니다.");
+        }
         cancelOrder(order);
     }
 
@@ -101,7 +104,7 @@ public class OrderService {
 
         int result = 0;
 
-        List<OrderHistory> orders = orderHistoryRepository.findByProductAndStatus(productCode, Status.PAID);
+        List<OrderHistory> orders = orderHistoryRepository.findByProductAndNotStatus(productCode, Status.CANCELLED);
 
         for (OrderHistory order : orders) {
             int price = order.getPrice();
