@@ -1,4 +1,4 @@
-package product.domain;
+package product.repository;
 
 import product.domain.Product;
 

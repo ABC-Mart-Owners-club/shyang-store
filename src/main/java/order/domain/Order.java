@@ -3,17 +3,15 @@ package order.domain;
 import pay.domain.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
-@ToString
 // 결재 단위 묶음
 public class Order {
 
-    private Long orderId;
+    private String orderCode;
 
     private List<OrderItem> orderItems; // 주문 상품 목록
 
@@ -26,10 +24,16 @@ public class Order {
 
     // 주문에 포함된 내역 모두 취소
     public void cancelOrder() {
-        if (orderStatus == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("이미 취소된 주문입니다.");
+
+        if (!OrderStatus.PAID.equals(this.orderStatus)) {
+            throw new IllegalStateException("이미 배송 시작 됐거나 이미 취소된 주문은 취소할 수 없습니다.");
         }
         orderStatus = OrderStatus.CANCELLED;
+    }
+
+
+    public void addPayment(Payment payment) {
+        payments.add(payment);
     }
 
 }
