@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class OrderProductRequestDto {
-
+public class OrderProductInfo {
     private String productCode;
     private int quantity;
+    private int buyPrice;
 }

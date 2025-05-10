@@ -1,4 +1,4 @@
-package domain;
+package product.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,6 @@ public class Product {
     private int price; // 가격
 
     private int stock;
-
 
     public void deductStock(int amount) {
         if (amount > stock) {throw new IllegalStateException("수량이 부족합니다.");}
