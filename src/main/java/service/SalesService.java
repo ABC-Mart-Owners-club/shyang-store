@@ -12,6 +12,8 @@ import pay.domain.PaymentMethod;
 import pay.repository.PayRepository;
 import product.domain.Product;
 import product.repository.ProductRepository;
+import stock.domain.Stock;
+import stock.repository.StockRepository;
 import user.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class SalesService {
     private ProductRepository productRepository;
     private UserRepository userRepository;
     private PayRepository payRepository;
+    private StockRepository stockRepository;
 
 
     // 1. 주문
@@ -32,6 +35,24 @@ public class SalesService {
 
         List<OrderProductInfo> orderProductInfos = orderRequestDto.getOrderProductInfoList();
         List<OrderPaymentInfo> orderPaymentInfos = orderRequestDto.getOrderPaymentInfoList();
+
+
+        for (OrderProductInfo orderProductInfo : orderProductInfos) {
+            String productCode = orderProductInfo.getProductCode();
+            int quantity = orderProductInfo.getQuantity();
+
+            List<Stock> stockOrderByReceivedDateDesc = stockRepository.findStockOrderByReceivedDateDesc(productCode);
+
+            for (Stock stock : stockOrderByReceivedDateDesc) {
+
+                if (stock.getStock() >= quantity) {
+                    stock.deductStock(quantity); // 재고 차감
+                    stockRepository.save(stock); // 재고 업데이트
+                    break; // 충분한 재고가 있는 경우 루프 종료
+                }
+            }
+        }
+
 
         List<OrderItem> orderItems = new ArrayList<>();
 
