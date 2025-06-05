@@ -1,4 +1,4 @@
-package domain;
+package user.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
