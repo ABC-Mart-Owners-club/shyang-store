@@ -29,30 +29,49 @@ public class SalesService {
     private StockRepository stockRepository;
 
 
-    // 1. 주문
+    // 1. 주문의 할인이 적용된 총 가격 조회
+    // 요걸로 결제 금액 구한 다음에 요거 유저에게 보여주고 분할 결제 할때 각각 가격 설 정할 수 있게
+    // 동선 : getTotalPrice -> order
+    public int getTotalPrice(List<OrderProductInfo> orderProductInfos) {
+
+        int totalPrice = 0;
+        for (OrderProductInfo orderProductInfo : orderProductInfos) {
+
+            String productCode = orderProductInfo.getProductCode();
+            int quantity = orderProductInfo.getQuantity();
+
+            int totalStock = productRepository.countTotalStock(productCode);
+            if (totalStock < quantity) {
+                throw new IllegalStateException("재고가 부족합니다."); // 예외 처리
+            }
+
+            List<Product> products = productRepository.findByCodeOrderByReceiveDate(productCode);
+            int flagQuantity = quantity; // 남은 수량을 추적하기 위한 변수
+
+            for (Product product : products) {
+
+                if (flagQuantity <= 0) {break;}
+
+                int stock = product.getStock();
+                int reduceQuantity = Math.min(flagQuantity, stock);
+
+                int discountPrice = product.getDiscountPrice();
+                totalPrice += discountPrice * reduceQuantity;
+
+                flagQuantity -= reduceQuantity;
+            }
+        }
+        return totalPrice;
+    }
+
+
+    // 2. 주문
     // 트랜잭션 적용됐다고 가정
+    // 할인가는 자동으로 적용되고 전체 가격은 getTotalPrice 로 전체 금액 알고 있는 상태
     public void order(String userName, OrderRequestDto orderRequestDto) {
 
         List<OrderProductInfo> orderProductInfos = orderRequestDto.getOrderProductInfoList();
         List<OrderPaymentInfo> orderPaymentInfos = orderRequestDto.getOrderPaymentInfoList();
-
-
-        for (OrderProductInfo orderProductInfo : orderProductInfos) {
-            String productCode = orderProductInfo.getProductCode();
-            int quantity = orderProductInfo.getQuantity();
-
-            List<Stock> stockOrderByReceivedDateDesc = stockRepository.findStockOrderByReceivedDateDesc(productCode);
-
-            for (Stock stock : stockOrderByReceivedDateDesc) {
-
-                if (stock.getStock() >= quantity) {
-                    stock.deductStock(quantity); // 재고 차감
-                    stockRepository.save(stock); // 재고 업데이트
-                    break; // 충분한 재고가 있는 경우 루프 종료
-                }
-            }
-        }
-
 
         List<OrderItem> orderItems = new ArrayList<>();
 
@@ -61,14 +80,37 @@ public class SalesService {
 
             String productCode = orderProductInfo.getProductCode();
             int quantity = orderProductInfo.getQuantity();
-            int buyPrice = orderProductInfo.getBuyPrice();
+            int totalStock = productRepository.countTotalStock(productCode);
 
-            Product product = productRepository.findByCode(productCode); // 예외 구현체에서 처리했다고 가정
-            product.deductStock(quantity); // 재고 차감
-            productRepository.save(product); // 재고 업데이트
+            if (totalStock < quantity) {
+                throw new IllegalStateException("재고가 부족합니다."); // 예외 처리
+            }
 
-            OrderItem orderItem = new OrderItem(product, quantity, buyPrice);
-            orderItems.add(orderItem);
+            // 예외 구현체에서 처리했다고 가정
+            // 오래된 입고순으로 상품 조회
+            List<Product> products = productRepository.findByCodeOrderByReceiveDate(productCode);
+
+            int totalPrice = 0;
+            int flagQuantity = quantity; // 남은 수량을 추적하기 위한 변수
+            for (Product product : products) {
+
+                if (flagQuantity <= 0) {
+                    break;
+                }
+
+                int stock = product.getStock();
+                int reduceQuantity = Math.min(flagQuantity, stock);
+
+                product.deductStock(reduceQuantity); // 재고 차감
+                productRepository.save(product); // 재고 업데이트
+
+                int discountPrice = product.getDiscountPrice();
+                OrderItem orderItem = new OrderItem(product, reduceQuantity, discountPrice);
+                orderItems.add(orderItem);
+
+                flagQuantity -= reduceQuantity;
+                totalPrice += discountPrice;
+            }
         }
 
         // 주문 객체 생성
