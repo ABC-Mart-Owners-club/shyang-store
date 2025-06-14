@@ -12,8 +12,6 @@ import pay.domain.PaymentMethod;
 import pay.repository.PayRepository;
 import product.domain.Product;
 import product.repository.ProductRepository;
-import stock.domain.Stock;
-import stock.repository.StockRepository;
 import user.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -26,7 +24,6 @@ public class SalesService {
     private ProductRepository productRepository;
     private UserRepository userRepository;
     private PayRepository payRepository;
-    private StockRepository stockRepository;
 
 
     // 1. 주문의 할인이 적용된 총 가격 조회

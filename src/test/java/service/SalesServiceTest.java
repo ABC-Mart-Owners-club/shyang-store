@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,35 +70,27 @@ class SalesServiceTest {
 
         // Given
         OrderProductInfo productInfo1 = new OrderProductInfo("P001", 3, 100_000);
-        OrderProductInfo productInfo2 = new OrderProductInfo("P002", 1, 200_000);
+        OrderProductInfo productInfo2 = new OrderProductInfo("P002", 2, 200_000);
+        OrderProductInfo productInfo3 = new OrderProductInfo("P003", 5, 150_000);
+        List<OrderProductInfo> orderProductInfos = List.of(productInfo1, productInfo2, productInfo3);
 
+        when(productRepository.countTotalStock("P001")).thenReturn(10);
+        when(productRepository.countTotalStock("P002")).thenReturn(10);
+        when(productRepository.countTotalStock("P003")).thenReturn(10);
 
-        OrderProductInfo orderProductInfo = new OrderProductInfo(productCode, orderQuantity);
-        List<OrderProductInfo> orderProductInfos = List.of(orderProductInfo);
-
-        // 총 재고 수량 확인
-        when(productRepository.countTotalStock(productCode)).thenReturn(5);
-
-        // 입고순 정렬된 상품 목록 (예: 오래된 재고부터 순회)
-        Product product1 = mock(Product.class); // 입고일 오래된 → 1개, 할인 30%
-        when(product1.getStock()).thenReturn(1);
-        when(product1.getDiscountPrice()).thenReturn(70); // 단가 100 → 30% 할인
-
-        Product product2 = mock(Product.class); // 중간 입고일 → 2개, 할인 없음
-        when(product2.getStock()).thenReturn(2);
-        when(product2.getDiscountPrice()).thenReturn(100); // 정가
-
-        List<Product> mockProductList = List.of(product1, product2);
-        when(productRepository.findByCodeOrderByReceiveDate(productCode)).thenReturn(mockProductList);
+        when(productRepository.findByCodeOrderByReceiveDate("P001")).thenReturn(List.of(product1_2, product1_1));
+        when(productRepository.findByCodeOrderByReceiveDate("P002")).thenReturn(List.of(product2_2, product2_1));
+        when(productRepository.findByCodeOrderByReceiveDate("P003")).thenReturn(List.of(product3));
 
         // When
-        int totalPrice = orderService.getTotalPrice(orderProductInfos);
+        int totalPrice = salesService.getTotalPrice(orderProductInfos);
 
         // Then
-        // product1: 1개 × 70 = 70
-        // product2: 2개 × 100 = 200
-        // 합계 = 270
-        assertEquals(270, totalPrice);
+        // P001 : 100_000 x 50% x 2 + 100_000 x 1 = 200_000
+        // P001 : 200_000 x 70% x 1 + 200_000 x 1 = 340_000
+        // P003 : 150_000 x 70% x 5 = 525_000
+        // 합계 : 1_065_000
+        assertEquals(1_065_000, totalPrice);
     }
 
     @Test
